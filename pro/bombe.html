@@ -1,0 +1,763 @@
+<!DOCTYPE html>
+<html lang="en" >
+<head>
+  <!-- Turing-Welchman Bombe Simulator - Copyright 101Computing.net - May 2019-->
+<script async src="https://www.googletagmanager.com/gtag/js?id=UA-24638485-49"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+
+  gtag('config', 'UA-24638485-49');
+</script>
+  <meta charset="UTF-8">
+  <title>The Turing-Welchman Bombe - Simulator by 101computing.net</title>
+  <link rel="stylesheet" href="css/style.css">
+  <script src='js/index.js'></script>
+</head>
+<body onload="setDrums(); reset();">
+<H1>The Turing-Welchman Bombe</H1>
+
+ <table id=crib><tr><td>Crib - plaintext:</td><td><input type="text" id="plaincrib" size=26 value="WETTERVORHERSAGE" maxlength=26></td><td><button onclick="showInstructions();" style="width: 200px; height: 30px; margin-left:20px;"> Show / Hide Instructions</button></td></tr>
+<tr><td>Crib - ciphertext:</td><td><input type="text" id="ciphercrib" value="SNMKGGSTZZUGARLV" size=26 maxlength=26></td><td><button onclick="traceGraph();" style="width: 200px; height: 30px; margin-left:20px;"> Show / Hide Menu / Graph</button> <button onclick="cribAnalysis();" style="width: 200px; height: 30px; margin-left:20px;"> Crib Analysis</button></td></tr></table>
+   <div id="mycanvas" style="display: none;">
+    <svg id="container"></svg>
+	<a onclick="autoFillMenu();" style="display: block; margin-top:-30px; color:black; margin-left:-140px; text-align:center; font-family: courier new;">Use this graph to autofill the Bombe Menu / Settings</a>
+  </div>
+  <div id="instructions" style="display: none;">
+  <center><u><strong>Instructions:</strong></u></center><br><br>
+  To operate this virtual model of a Turing-Welchman Bombe you will need to complete the following steps in order:
+  <ol><li>Enter the crib in the two textboxes above (plaintext and ciphertext of the crib).</li>
+  <li>Create the menu from this crib. You can do so on paper or use the "Show / Hide Menu" button above.</li>
+  <li>Select twelve connections from this menu and enter them in the menu settings sections below. For each connection, you will need to enter the connection label (e.g. ZZK), the two node letters (U and E). To minimise the number of invalid stops of the Bombe, you should select connections that form one or more cycle. Note that on the real Turing-Welchman Bombe, these settings were entered at the back of the machine through a complex system of wires.</li>
+  <li>Choose three different sets of drums. (Top / Middle / Bottom). These drums match the Enigma rotors (Left / Middle / Right).</li>
+  <li>Choose the reflector to use. (Engima M3 machines were equipped with either a UKW-B or UKW-C reflector.)</li>
+  <li>Choose the "input letter". To do so you should pick a central letter from the graph.
+  <li>Press the Setup/Reset button below. This will align all the drums in position.</li>
+  <li>Press the Start button below. The Bombe will start looking for possible enigma settings that could be used to encrypt/decrypt your selected twelve connections. The Bombe will stop if it finds a potential set of settings. On our virtual model, these will be displayed in the lower section of the machine. They will include:
+  <ul><li>Rotor Settings: The three rotors you have selected.</li>
+  <li>Reflector Settings: The reflector you have selected.</li>
+  <li>Ring Settings: The ring settings for the Enigma.</li>
+  <li>Initial Rotor Positions: The initial rotor position for the Enigma.</li>
+  <li>Plugboard Connections: The Bombe will find most (but not all) plugboard connections. This should be enough to test the settings on <a onclick="enigmaWindow();">an enigma machine</a>. With some further deductions you should then be able to determine the missing plugboard settings.</li>
+  </ul>
+  <li>Not all stops of the Bombe will output the correct settings. The settings must be tested (e.g. using <a onclick="enigmaWindow();">an enigma machine)</a> to confirm if they are the correct ones or not. If not, you will need to continue searching through other possibilities by pressing the "step over" button below.</li>
+  <li>Once the indicator drums will have checked all possible settings, the Bombe will stop again.</li>
+  <li>You may need to repeat steps 4 to 10 with different sets of drums and / or with a different reflector.</li>
+  </ol>
+  <BR>
+  Note that the real Turing-Welchman Bombe consisted of three banks of drums. Each bank contained three rows of twelve drums. Having three banks of drums enabled code breakers to test three different sets of rotors simultaneously. Our online simulator only controls one bank of drums. On the other hand, this online simulator has a higher RPM rate (rotations per minute) hence will test a range of enigma settings at a faster pace than a physical machine. You can also use its "continuous mode" and let it run over a long period of time and it will test all 60 different drums settings in sequential order.
+  <BR><BR>
+  Finally, this online simulator generates less false stops than a real Turing-Welchman Bombe would generate under the same configuration. It is due to the fact that it automatically performs the test normally performed by a separate checking machine to ignore some of these false stops.
+  <BR><BR>
+  To test different enigma settings to encrypt or decrypt messages, use our <a onclick="enigmaWindow();">online Enigma M3 emulator</a>.
+  </div>
+  
+<div id="theTuringBombe">
+<div class="drumbank">
+<div class="row redRow">  
+  <div class="drum"><svg viewBox="0 0 240 240" width="80" height="80"><defs><path id="criclePath" d=" M 120, 120 m -100, 0 a 100,100 0 0,1 200,0 a 100,100 0 0,1 -200,0 "/></defs><g class="circleText"><use xlink:href="#criclePath" fill="none"/><text class="drumText"><textPath xlink:href="#criclePath" >I H G F E D C B A Z Y X W V U T S R Q P O N M L K J</textPath></text></g></svg></div>
+  <div class="drum"><svg viewBox="0 0 240 240" width="80" height="80"><defs><path id="criclePath" d=" M 120, 120 m -100, 0 a 100,100 0 0,1 200,0 a 100,100 0 0,1 -200,0 "/></defs><g class="circleText"><use xlink:href="#criclePath" fill="none"/><text class="drumText"><textPath xlink:href="#criclePath" >I H G F E D C B A Z Y X W V U T S R Q P O N M L K J</textPath></text></g></svg></div>
+  <div class="drum"><svg viewBox="0 0 240 240" width="80" height="80"><defs><path id="criclePath" d=" M 120, 120 m -100, 0 a 100,100 0 0,1 200,0 a 100,100 0 0,1 -200,0 "/></defs><g class="circleText"><use xlink:href="#criclePath" fill="none"/><text class="drumText"><textPath xlink:href="#criclePath" >I H G F E D C B A Z Y X W V U T S R Q P O N M L K J</textPath></text></g></svg></div>
+  <div class="drum"><svg viewBox="0 0 240 240" width="80" height="80"><defs><path id="criclePath" d=" M 120, 120 m -100, 0 a 100,100 0 0,1 200,0 a 100,100 0 0,1 -200,0 "/></defs><g class="circleText"><use xlink:href="#criclePath" fill="none"/><text class="drumText"><textPath xlink:href="#criclePath" >I H G F E D C B A Z Y X W V U T S R Q P O N M L K J</textPath></text></g></svg></div>
+  <div class="drum"><svg viewBox="0 0 240 240" width="80" height="80"><defs><path id="criclePath" d=" M 120, 120 m -100, 0 a 100,100 0 0,1 200,0 a 100,100 0 0,1 -200,0 "/></defs><g class="circleText"><use xlink:href="#criclePath" fill="none"/><text class="drumText"><textPath xlink:href="#criclePath" >I H G F E D C B A Z Y X W V U T S R Q P O N M L K J</textPath></text></g></svg></div>
+  <div class="drum"><svg viewBox="0 0 240 240" width="80" height="80"><defs><path id="criclePath" d=" M 120, 120 m -100, 0 a 100,100 0 0,1 200,0 a 100,100 0 0,1 -200,0 "/></defs><g class="circleText"><use xlink:href="#criclePath" fill="none"/><text class="drumText"><textPath xlink:href="#criclePath" >I H G F E D C B A Z Y X W V U T S R Q P O N M L K J</textPath></text></g></svg></div>
+  <div class="drum"><svg viewBox="0 0 240 240" width="80" height="80"><defs><path id="criclePath" d=" M 120, 120 m -100, 0 a 100,100 0 0,1 200,0 a 100,100 0 0,1 -200,0 "/></defs><g class="circleText"><use xlink:href="#criclePath" fill="none"/><text class="drumText"><textPath xlink:href="#criclePath" >I H G F E D C B A Z Y X W V U T S R Q P O N M L K J</textPath></text></g></svg></div>
+  <div class="drum"><svg viewBox="0 0 240 240" width="80" height="80"><defs><path id="criclePath" d=" M 120, 120 m -100, 0 a 100,100 0 0,1 200,0 a 100,100 0 0,1 -200,0 "/></defs><g class="circleText"><use xlink:href="#criclePath" fill="none"/><text class="drumText"><textPath xlink:href="#criclePath" >I H G F E D C B A Z Y X W V U T S R Q P O N M L K J</textPath></text></g></svg></div>
+  <div class="drum"><svg viewBox="0 0 240 240" width="80" height="80"><defs><path id="criclePath" d=" M 120, 120 m -100, 0 a 100,100 0 0,1 200,0 a 100,100 0 0,1 -200,0 "/></defs><g class="circleText"><use xlink:href="#criclePath" fill="none"/><text class="drumText"><textPath xlink:href="#criclePath" >I H G F E D C B A Z Y X W V U T S R Q P O N M L K J</textPath></text></g></svg></div>
+  <div class="drum"><svg viewBox="0 0 240 240" width="80" height="80"><defs><path id="criclePath" d=" M 120, 120 m -100, 0 a 100,100 0 0,1 200,0 a 100,100 0 0,1 -200,0 "/></defs><g class="circleText"><use xlink:href="#criclePath" fill="none"/><text class="drumText"><textPath xlink:href="#criclePath" >I H G F E D C B A Z Y X W V U T S R Q P O N M L K J</textPath></text></g></svg></div>
+  <div class="drum"><svg viewBox="0 0 240 240" width="80" height="80"><defs><path id="criclePath" d=" M 120, 120 m -100, 0 a 100,100 0 0,1 200,0 a 100,100 0 0,1 -200,0 "/></defs><g class="circleText"><use xlink:href="#criclePath" fill="none"/><text class="drumText"><textPath xlink:href="#criclePath" >I H G F E D C B A Z Y X W V U T S R Q P O N M L K J</textPath></text></g></svg></div>
+  <div class="drum"><svg viewBox="0 0 240 240" width="80" height="80"><defs><path id="criclePath" d=" M 120, 120 m -100, 0 a 100,100 0 0,1 200,0 a 100,100 0 0,1 -200,0 "/></defs><g class="circleText"><use xlink:href="#criclePath" fill="none"/><text class="drumText"><textPath xlink:href="#criclePath" >I H G F E D C B A Z Y X W V U T S R Q P O N M L K J</textPath></text></g></svg></div>
+</div>  
+<div class="row maroonRow">  
+  <div class="drum"><svg viewBox="0 0 240 240" width="80" height="80"><defs><path id="criclePath" d=" M 120, 120 m -100, 0 a 100,100 0 0,1 200,0 a 100,100 0 0,1 -200,0 "/></defs><g class="circleText"><use xlink:href="#criclePath" fill="none"/><text class="drumText"><textPath xlink:href="#criclePath" >I H G F E D C B A Z Y X W V U T S R Q P O N M L K J</textPath></text></g></svg></div>
+  <div class="drum"><svg viewBox="0 0 240 240" width="80" height="80"><defs><path id="criclePath" d=" M 120, 120 m -100, 0 a 100,100 0 0,1 200,0 a 100,100 0 0,1 -200,0 "/></defs><g class="circleText"><use xlink:href="#criclePath" fill="none"/><text class="drumText"><textPath xlink:href="#criclePath" >I H G F E D C B A Z Y X W V U T S R Q P O N M L K J</textPath></text></g></svg></div>
+  <div class="drum"><svg viewBox="0 0 240 240" width="80" height="80"><defs><path id="criclePath" d=" M 120, 120 m -100, 0 a 100,100 0 0,1 200,0 a 100,100 0 0,1 -200,0 "/></defs><g class="circleText"><use xlink:href="#criclePath" fill="none"/><text class="drumText"><textPath xlink:href="#criclePath" >I H G F E D C B A Z Y X W V U T S R Q P O N M L K J</textPath></text></g></svg></div>
+  <div class="drum"><svg viewBox="0 0 240 240" width="80" height="80"><defs><path id="criclePath" d=" M 120, 120 m -100, 0 a 100,100 0 0,1 200,0 a 100,100 0 0,1 -200,0 "/></defs><g class="circleText"><use xlink:href="#criclePath" fill="none"/><text class="drumText"><textPath xlink:href="#criclePath" >I H G F E D C B A Z Y X W V U T S R Q P O N M L K J</textPath></text></g></svg></div>
+  <div class="drum"><svg viewBox="0 0 240 240" width="80" height="80"><defs><path id="criclePath" d=" M 120, 120 m -100, 0 a 100,100 0 0,1 200,0 a 100,100 0 0,1 -200,0 "/></defs><g class="circleText"><use xlink:href="#criclePath" fill="none"/><text class="drumText"><textPath xlink:href="#criclePath" >I H G F E D C B A Z Y X W V U T S R Q P O N M L K J</textPath></text></g></svg></div>
+  <div class="drum"><svg viewBox="0 0 240 240" width="80" height="80"><defs><path id="criclePath" d=" M 120, 120 m -100, 0 a 100,100 0 0,1 200,0 a 100,100 0 0,1 -200,0 "/></defs><g class="circleText"><use xlink:href="#criclePath" fill="none"/><text class="drumText"><textPath xlink:href="#criclePath" >I H G F E D C B A Z Y X W V U T S R Q P O N M L K J</textPath></text></g></svg></div>
+  <div class="drum"><svg viewBox="0 0 240 240" width="80" height="80"><defs><path id="criclePath" d=" M 120, 120 m -100, 0 a 100,100 0 0,1 200,0 a 100,100 0 0,1 -200,0 "/></defs><g class="circleText"><use xlink:href="#criclePath" fill="none"/><text class="drumText"><textPath xlink:href="#criclePath" >I H G F E D C B A Z Y X W V U T S R Q P O N M L K J</textPath></text></g></svg></div>
+  <div class="drum"><svg viewBox="0 0 240 240" width="80" height="80"><defs><path id="criclePath" d=" M 120, 120 m -100, 0 a 100,100 0 0,1 200,0 a 100,100 0 0,1 -200,0 "/></defs><g class="circleText"><use xlink:href="#criclePath" fill="none"/><text class="drumText"><textPath xlink:href="#criclePath" >I H G F E D C B A Z Y X W V U T S R Q P O N M L K J</textPath></text></g></svg></div>
+  <div class="drum"><svg viewBox="0 0 240 240" width="80" height="80"><defs><path id="criclePath" d=" M 120, 120 m -100, 0 a 100,100 0 0,1 200,0 a 100,100 0 0,1 -200,0 "/></defs><g class="circleText"><use xlink:href="#criclePath" fill="none"/><text class="drumText"><textPath xlink:href="#criclePath" >I H G F E D C B A Z Y X W V U T S R Q P O N M L K J</textPath></text></g></svg></div>
+  <div class="drum"><svg viewBox="0 0 240 240" width="80" height="80"><defs><path id="criclePath" d=" M 120, 120 m -100, 0 a 100,100 0 0,1 200,0 a 100,100 0 0,1 -200,0 "/></defs><g class="circleText"><use xlink:href="#criclePath" fill="none"/><text class="drumText"><textPath xlink:href="#criclePath" >I H G F E D C B A Z Y X W V U T S R Q P O N M L K J</textPath></text></g></svg></div>
+  <div class="drum"><svg viewBox="0 0 240 240" width="80" height="80"><defs><path id="criclePath" d=" M 120, 120 m -100, 0 a 100,100 0 0,1 200,0 a 100,100 0 0,1 -200,0 "/></defs><g class="circleText"><use xlink:href="#criclePath" fill="none"/><text class="drumText"><textPath xlink:href="#criclePath" >I H G F E D C B A Z Y X W V U T S R Q P O N M L K J</textPath></text></g></svg></div>
+  <div class="drum"><svg viewBox="0 0 240 240" width="80" height="80"><defs><path id="criclePath" d=" M 120, 120 m -100, 0 a 100,100 0 0,1 200,0 a 100,100 0 0,1 -200,0 "/></defs><g class="circleText"><use xlink:href="#criclePath" fill="none"/><text class="drumText"><textPath xlink:href="#criclePath" >I H G F E D C B A Z Y X W V U T S R Q P O N M L K J</textPath></text></g></svg></div>
+</div>   
+ <div class="row greenRow">  
+  <div class="drum"><svg viewBox="0 0 240 240" width="80" height="80"><defs><path id="criclePath" d=" M 120, 120 m -100, 0 a 100,100 0 0,1 200,0 a 100,100 0 0,1 -200,0 "/></defs><g class="circleText"><use xlink:href="#criclePath" fill="none"/><text class="drumText"><textPath xlink:href="#criclePath" >I H G F E D C B A Z Y X W V U T S R Q P O N M L K J</textPath></text></g></svg></div>
+  <div class="drum"><svg viewBox="0 0 240 240" width="80" height="80"><defs><path id="criclePath" d=" M 120, 120 m -100, 0 a 100,100 0 0,1 200,0 a 100,100 0 0,1 -200,0 "/></defs><g class="circleText"><use xlink:href="#criclePath" fill="none"/><text class="drumText"><textPath xlink:href="#criclePath" >I H G F E D C B A Z Y X W V U T S R Q P O N M L K J</textPath></text></g></svg></div>
+  <div class="drum"><svg viewBox="0 0 240 240" width="80" height="80"><defs><path id="criclePath" d=" M 120, 120 m -100, 0 a 100,100 0 0,1 200,0 a 100,100 0 0,1 -200,0 "/></defs><g class="circleText"><use xlink:href="#criclePath" fill="none"/><text class="drumText"><textPath xlink:href="#criclePath" >I H G F E D C B A Z Y X W V U T S R Q P O N M L K J</textPath></text></g></svg></div>
+  <div class="drum"><svg viewBox="0 0 240 240" width="80" height="80"><defs><path id="criclePath" d=" M 120, 120 m -100, 0 a 100,100 0 0,1 200,0 a 100,100 0 0,1 -200,0 "/></defs><g class="circleText"><use xlink:href="#criclePath" fill="none"/><text class="drumText"><textPath xlink:href="#criclePath" >I H G F E D C B A Z Y X W V U T S R Q P O N M L K J</textPath></text></g></svg></div>
+  <div class="drum"><svg viewBox="0 0 240 240" width="80" height="80"><defs><path id="criclePath" d=" M 120, 120 m -100, 0 a 100,100 0 0,1 200,0 a 100,100 0 0,1 -200,0 "/></defs><g class="circleText"><use xlink:href="#criclePath" fill="none"/><text class="drumText"><textPath xlink:href="#criclePath" >I H G F E D C B A Z Y X W V U T S R Q P O N M L K J</textPath></text></g></svg></div>
+  <div class="drum"><svg viewBox="0 0 240 240" width="80" height="80"><defs><path id="criclePath" d=" M 120, 120 m -100, 0 a 100,100 0 0,1 200,0 a 100,100 0 0,1 -200,0 "/></defs><g class="circleText"><use xlink:href="#criclePath" fill="none"/><text class="drumText"><textPath xlink:href="#criclePath" >I H G F E D C B A Z Y X W V U T S R Q P O N M L K J</textPath></text></g></svg></div>
+  <div class="drum"><svg viewBox="0 0 240 240" width="80" height="80"><defs><path id="criclePath" d=" M 120, 120 m -100, 0 a 100,100 0 0,1 200,0 a 100,100 0 0,1 -200,0 "/></defs><g class="circleText"><use xlink:href="#criclePath" fill="none"/><text class="drumText"><textPath xlink:href="#criclePath" >I H G F E D C B A Z Y X W V U T S R Q P O N M L K J</textPath></text></g></svg></div>
+  <div class="drum"><svg viewBox="0 0 240 240" width="80" height="80"><defs><path id="criclePath" d=" M 120, 120 m -100, 0 a 100,100 0 0,1 200,0 a 100,100 0 0,1 -200,0 "/></defs><g class="circleText"><use xlink:href="#criclePath" fill="none"/><text class="drumText"><textPath xlink:href="#criclePath" >I H G F E D C B A Z Y X W V U T S R Q P O N M L K J</textPath></text></g></svg></div>
+  <div class="drum"><svg viewBox="0 0 240 240" width="80" height="80"><defs><path id="criclePath" d=" M 120, 120 m -100, 0 a 100,100 0 0,1 200,0 a 100,100 0 0,1 -200,0 "/></defs><g class="circleText"><use xlink:href="#criclePath" fill="none"/><text class="drumText"><textPath xlink:href="#criclePath" >I H G F E D C B A Z Y X W V U T S R Q P O N M L K J</textPath></text></g></svg></div>
+  <div class="drum"><svg viewBox="0 0 240 240" width="80" height="80"><defs><path id="criclePath" d=" M 120, 120 m -100, 0 a 100,100 0 0,1 200,0 a 100,100 0 0,1 -200,0 "/></defs><g class="circleText"><use xlink:href="#criclePath" fill="none"/><text class="drumText"><textPath xlink:href="#criclePath" >I H G F E D C B A Z Y X W V U T S R Q P O N M L K J</textPath></text></g></svg></div>
+  <div class="drum"><svg viewBox="0 0 240 240" width="80" height="80"><defs><path id="criclePath" d=" M 120, 120 m -100, 0 a 100,100 0 0,1 200,0 a 100,100 0 0,1 -200,0 "/></defs><g class="circleText"><use xlink:href="#criclePath" fill="none"/><text class="drumText"><textPath xlink:href="#criclePath" >I H G F E D C B A Z Y X W V U T S R Q P O N M L K J</textPath></text></g></svg></div>
+  <div class="drum"><svg viewBox="0 0 240 240" width="80" height="80"><defs><path id="criclePath" d=" M 120, 120 m -100, 0 a 100,100 0 0,1 200,0 a 100,100 0 0,1 -200,0 "/></defs><g class="circleText"><use xlink:href="#criclePath" fill="none"/><text class="drumText"><textPath xlink:href="#criclePath" >I H G F E D C B A Z Y X W V U T S R Q P O N M L K J</textPath></text></g></svg></div>
+</div> 
+  <div class="drumBankSettings">
+<H2>Drums Settings (Top Row / Middle Row / Bottom Row / Reflector) &amp; Input Letter:</H2>
+  <div id="drumSettings">
+ <div class="select">
+    <select id=topDrum onchange="changeDrums('1', this.value);">
+    <option>I</option>
+    <option>II</option>
+    <option>III</option>
+    <option>IV</option>
+    <option>V</option>
+  </select>
+  <div class="select_arrow"></div>
+</div> 
+ <div class="select">
+    <select id=middleDrum onchange="changeDrums('2', this.value);	playStepSound();">
+    <option>I</option>
+    <option>II</option>
+    <option>III</option>
+    <option>IV</option>
+    <option>V</option>
+  </select>
+  <div class="select_arrow"></div>
+</div> 
+ <div class="select">
+    <select id=bottomDrum onchange="changeDrums('3', this.value);	playStepSound();">
+    <option>I</option>
+    <option>II</option>
+    <option>III</option>
+    <option>IV</option>
+    <option>V</option>
+  </select>
+  <div class="select_arrow"></div>
+</div> 
+ <div class="select">
+  <select id=reflectorBC onchange="changeReflector(this.value);	playStepSound();">
+    <option selected>UKW-B</option>
+    <option>UKW-C</option>
+  </select>
+  <div class="select_arrow"></div>
+</div> - <div class="select">
+  <select id="inputLetter" onChange="stopMachine(); hypothesis = this.value;">
+    <option>A</option>
+    <option>B</option>
+    <option>C</option>
+    <option>D</option>
+    <option>E</option>
+    <option>F</option>
+    <option selected>G</option>
+    <option>H</option>
+    <option>I</option>
+    <option>J</option>
+    <option>K</option>
+    <option>L</option>
+    <option>M</option>
+    <option>N</option>
+    <option>O</option>
+    <option>P</option>
+    <option>Q</option>
+    <option>R</option>
+    <option>S</option>
+    <option>T</option>
+    <option>U</option>
+    <option>V</option>
+    <option>W</option>
+    <option>X</option>
+    <option>Y</option>
+    <option>Z</option>
+  </select>
+  <div class="select_arrow"></div>
+</div><div style="float: right;"><input type="checkbox" style="width:20px; height: 20px; border-radius: 3px; vertical-align:middle;" onchange="mute=this.checked; if (mute) myAudio.pause();">Mute</div>
+  </div>
+<H2>Menu Settings / Connections:</H2>
+  <table><tr>
+<td><input type=text id="rotorSettings1" value="ZZK" size=3 maxlength=3 class="SettingsInput" onchange="selectEnigma('1',this.value);">
+<br/><input id="plain1" class="SettingsInput" size=1 maxlength=1 value="U"><br/><input id="cipher1" class="SettingsInput" size=1 maxlength=1 value="E"></td>
+<td><input type=text id="rotorSettings2" value="ZZE" size=3 maxlength=3 class="SettingsInput" onchange="selectEnigma('2',this.value);">
+<br/><input id="plain2" class="SettingsInput" size=1 maxlength=1 value="E"><br/><input id="cipher2" class="SettingsInput" size=1 maxlength=1 value="G"></td>
+<td><input type=text id="rotorSettings3" value="ZZF" size=3 maxlength=3 class="SettingsInput" onchange="selectEnigma('3',this.value);">
+<br/><input id="plain3" class="SettingsInput" size=1 maxlength=1 value="G"><br/><input id="cipher3" class="SettingsInput" size=1 maxlength=1 value="R"></td>
+<td><input type=text id="rotorSettings4" value="ZZN" size=3 maxlength=3 class="SettingsInput" onchange="selectEnigma('4',this.value);">
+<br/><input id="plain4" class="SettingsInput" size=1 maxlength=1 value="R"><br/><input id="cipher4" class="SettingsInput" size=1 maxlength=1 value="A"></td>
+<td><input type=text id="rotorSettings5" value="ZZM" size=3 maxlength=3 class="SettingsInput" onchange="selectEnigma('5',this.value);">
+<br/><input id="plain5" class="SettingsInput" size=1 maxlength=1 value="A"><br/><input id="cipher5" class="SettingsInput" size=1 maxlength=1 value="S"></td>
+<td><input type=text id="rotorSettings6" value="ZZG" size=3 maxlength=3 class="SettingsInput" onchange="selectEnigma('6',this.value);">
+<br/><input id="plain6" class="SettingsInput" size=1 maxlength=1 value="S"><br/><input id="cipher6" class="SettingsInput" size=1 maxlength=1 value="V"></td>
+<td><input type=text id="rotorSettings7" value="ZZP" size=3 maxlength=3 class="SettingsInput" onchange="selectEnigma('7',this.value);">
+<br/><input id="plain7" class="SettingsInput" size=1 maxlength=1 value="V"><br/><input id="cipher7" class="SettingsInput" size=1 maxlength=1 value="E"></td>
+<td><input type=text id="rotorSettings8" value="ZZB" size=3 maxlength=3 class="SettingsInput" onchange="selectEnigma('8',this.value);">
+<br/><input id="plain8" class="SettingsInput" size=1 maxlength=1 value="E"><br/><input id="cipher8" class="SettingsInput" size=1 maxlength=1 value="N"></td>
+<td><input type=text id="rotorSettings9" value="ZZJ" size=3 maxlength=3 class="SettingsInput" onchange="selectEnigma('9',this.value);">
+<br/><input id="plain9" class="SettingsInput" size=1 maxlength=1 value="H"><br/><input id="cipher9" class="SettingsInput" size=1 maxlength=1 value="Z"></td>
+<td><input type=text id="rotorSettings10" value="ZZI" size=3 maxlength=3 class="SettingsInput" onchange="selectEnigma('10',this.value);">
+<br/><input id="plain10" class="SettingsInput" size=1 maxlength=1 value="Z"><br/><input id="cipher10" class="SettingsInput" size=1 maxlength=1 value="R"></td>
+<td><input type=text id="rotorSettings11" value="ZZL" size=3 maxlength=3 class="SettingsInput" onchange="selectEnigma('11',this.value);">
+<br/><input id="plain11" class="SettingsInput" size=1 maxlength=1 value="R"><br/><input id="cipher11" class="SettingsInput" size=1 maxlength=1 value="G"></td>
+<td><input type=text id="rotorSettings12" value="ZZO" size=3 maxlength=3 class="SettingsInput" onchange="selectEnigma('12',this.value);">
+<br/><input id="plain12" class="SettingsInput" size=1 maxlength=1 value="G"><br/><input id="cipher12" class="SettingsInput" size=1 maxlength=1 value="L"></td>
+</tr></table>  
+<H2>Machine Commands:</H2>
+   <!--<BUTTON onclick="faster();">Faster</BUTTON><BUTTON onclick="slower();">Slower</BUTTON>-->
+ <BUTTON onclick="stopMachine(); reset();">Setup / Reset</BUTTON>
+ <BUTTON onclick="startMachine()">Start</BUTTON>
+ <BUTTON onclick="stopMachine();">Stop</BUTTON>
+ <BUTTON onclick="resumeMachine();">Resume</BUTTON>
+ <BUTTON onclick="stopMachine(); step();">Step</BUTTON><div style="float: right;"><input type="checkbox" style="width:20px; height: 20px; border-radius: 3px; vertical-align:middle;" onchange="continuous=this.checked;"><A onclick="alert('Continuous mode is not an original setting of the Turing-Welchman Bombe. It is a feature of our virtual simulator which enables you to test each of the 60 possible rotors settings, one setting at a time. This will take a while to complete but will eventually give you all potential enigma settings matching your crib (using the selected reflector).');">Continuous mode</A></div>
+  </div>
+</div>
+  
+  
+<div id="row1" class="row redRow">
+<div class="drum">
+	<svg viewBox="0 0 240 240" width="80" height="80" id="drum1">
+		<defs><path id="criclePath" d=" M 120, 120 m -100, 0 a 100,100 0 0,1 200,0 a 100,100 0 0,1 -200,0 "/></defs>
+			<g class="circleText fast" id="r11">
+					<use xlink:href="#criclePath" fill="none"/>
+					<text class="drumText">
+							<textPath xlink:href="#criclePath" >I H G F E D C B A Z Y X W V U T S R Q P O N M L K J</textPath>
+					</text>
+			</g>
+			<g><text x="100" y="140" class="drumHeading" id="rotor11">Z</text></g>		
+	</svg>
+</div>
+<div class="drum">
+	<svg viewBox="0 0 240 240" width="80" height="80">
+		<defs><path id="criclePath" d=" M 120, 120 m -100, 0 a 100,100 0 0,1 200,0 a 100,100 0 0,1 -200,0 "/></defs>
+			<g class="circleText fast" id="r21">
+					<use xlink:href="#criclePath" fill="none"/>
+					<text class="drumText">
+							<textPath xlink:href="#criclePath" >I H G F E D C B A Z Y X W V U T S R Q P O N M L K J</textPath>
+					</text>
+			</g>
+			<g><text x="100" y="140" class="drumHeading" id="rotor21">Z</text></g>
+	</svg>
+</div>
+<div class="drum">
+	<svg viewBox="0 0 240 240" width="80" height="80">
+		<defs><path id="criclePath" d=" M 120, 120 m -100, 0 a 100,100 0 0,1 200,0 a 100,100 0 0,1 -200,0 "/></defs>
+			<g class="circleText fast" id="r31">
+					<use xlink:href="#criclePath" fill="none"/>
+					<text class="drumText">
+							<textPath xlink:href="#criclePath" >I H G F E D C B A Z Y X W V U T S R Q P O N M L K J</textPath>
+					</text>
+			</g>
+			<g><text x="100" y="140" class="drumHeading" id="rotor31">Z</text></g>
+	</svg>
+</div>
+<div class="drum">
+	<svg viewBox="0 0 240 240" width="80" height="80">
+		<defs><path id="criclePath" d=" M 120, 120 m -100, 0 a 100,100 0 0,1 200,0 a 100,100 0 0,1 -200,0 "/></defs>
+			<g class="circleText fast" id="r41">
+					<use xlink:href="#criclePath" fill="none"/>
+					<text class="drumText">
+							<textPath xlink:href="#criclePath" >I H G F E D C B A Z Y X W V U T S R Q P O N M L K J</textPath>
+					</text>
+			</g>
+			<g><text x="100" y="140" class="drumHeading" id="rotor41">Z</text></g>
+	</svg>
+</div>
+<div class="drum">
+	<svg viewBox="0 0 240 240" width="80" height="80">
+		<defs><path id="criclePath" d=" M 120, 120 m -100, 0 a 100,100 0 0,1 200,0 a 100,100 0 0,1 -200,0 "/></defs>
+			<g class="circleText fast" id="r51">
+					<use xlink:href="#criclePath" fill="none"/>
+					<text class="drumText">
+							<textPath xlink:href="#criclePath" >I H G F E D C B A Z Y X W V U T S R Q P O N M L K J</textPath>
+					</text>
+			</g>
+			<g><text x="100" y="140" class="drumHeading" id="rotor51">Z</text></g>
+	</svg>
+</div>
+<div class="drum">
+	<svg viewBox="0 0 240 240" width="80" height="80">
+		<defs><path id="criclePath" d=" M 120, 120 m -100, 0 a 100,100 0 0,1 200,0 a 100,100 0 0,1 -200,0 "/></defs>
+			<g class="circleText fast" id="r61">
+					<use xlink:href="#criclePath" fill="none"/>
+					<text class="drumText">
+							<textPath xlink:href="#criclePath" >I H G F E D C B A Z Y X W V U T S R Q P O N M L K J</textPath>
+					</text>
+			</g>
+			<g><text x="100" y="140" class="drumHeading" id="rotor61">Z</text></g>
+	</svg>
+</div>
+<div class="drum">
+	<svg viewBox="0 0 240 240" width="80" height="80">
+		<defs><path id="criclePath" d=" M 120, 120 m -100, 0 a 100,100 0 0,1 200,0 a 100,100 0 0,1 -200,0 "/></defs>
+			<g class="circleText fast" id="r71">
+					<use xlink:href="#criclePath" fill="none"/>
+					<text class="drumText">
+							<textPath xlink:href="#criclePath" >I H G F E D C B A Z Y X W V U T S R Q P O N M L K J</textPath>
+					</text>
+			</g>
+			<g><text x="100" y="140" class="drumHeading" id="rotor71">Z</text></g>
+	</svg>
+</div>
+<div class="drum">
+	<svg viewBox="0 0 240 240" width="80" height="80">
+		<defs><path id="criclePath" d=" M 120, 120 m -100, 0 a 100,100 0 0,1 200,0 a 100,100 0 0,1 -200,0 "/></defs>
+			<g class="circleText fast" id="r81">
+					<use xlink:href="#criclePath" fill="none"/>
+					<text class="drumText">
+							<textPath xlink:href="#criclePath" >I H G F E D C B A Z Y X W V U T S R Q P O N M L K J</textPath>
+					</text>
+			</g>
+			<g><text x="100" y="140" class="drumHeading" id="rotor81">Z</text></g>
+	</svg>
+</div>
+<div class="drum">
+	<svg viewBox="0 0 240 240" width="80" height="80">
+		<defs><path id="criclePath" d=" M 120, 120 m -100, 0 a 100,100 0 0,1 200,0 a 100,100 0 0,1 -200,0 "/></defs>
+			<g class="circleText fast" id="r91">
+					<use xlink:href="#criclePath" fill="none"/>
+					<text class="drumText">
+							<textPath xlink:href="#criclePath" >I H G F E D C B A Z Y X W V U T S R Q P O N M L K J</textPath>
+					</text>
+			</g>
+			<g><text x="100" y="140" class="drumHeading" id="rotor91">Z</text></g>
+	</svg>
+</div>
+<div class="drum">
+	<svg viewBox="0 0 240 240" width="80" height="80">
+		<defs><path id="criclePath" d=" M 120, 120 m -100, 0 a 100,100 0 0,1 200,0 a 100,100 0 0,1 -200,0 "/></defs>
+			<g class="circleText fast" id="r101">
+					<use xlink:href="#criclePath" fill="none"/>
+					<text class="drumText">
+							<textPath xlink:href="#criclePath" >I H G F E D C B A Z Y X W V U T S R Q P O N M L K J</textPath>
+					</text>
+			</g>
+			<g><text x="100" y="140" class="drumHeading" id="rotor101">Z</text></g>
+	</svg>
+</div>
+<div class="drum">
+	<svg viewBox="0 0 240 240" width="80" height="80">
+		<defs><path id="criclePath" d=" M 120, 120 m -100, 0 a 100,100 0 0,1 200,0 a 100,100 0 0,1 -200,0 "/></defs>
+			<g class="circleText fast" id="r111">
+					<use xlink:href="#criclePath" fill="none"/>
+					<text class="drumText">
+							<textPath xlink:href="#criclePath" >I H G F E D C B A Z Y X W V U T S R Q P O N M L K J</textPath>
+					</text>
+			</g>
+			<g><text x="100" y="140" class="drumHeading" id="rotor111">Z</text></g>
+	</svg>
+</div>
+<div class="drum">
+	<svg viewBox="0 0 240 240" width="80" height="80">
+		<defs><path id="criclePath" d=" M 120, 120 m -100, 0 a 100,100 0 0,1 200,0 a 100,100 0 0,1 -200,0 "/></defs>
+			<g class="circleText fast" id="r121">
+					<use xlink:href="#criclePath" fill="none"/>
+					<text class="drumText">
+							<textPath xlink:href="#criclePath" >I H G F E D C B A Z Y X W V U T S R Q P O N M L K J</textPath>
+					</text>
+			</g>
+			<g><text x="100" y="140" class="drumHeading" id="rotor121">Z</text></g>
+	</svg>
+</div>
+<div class="drum yellowDrum">
+	<svg viewBox="0 0 240 240" width="80" height="80">
+		<defs><path id="criclePath" d=" M 120, 120 m -100, 0 a 100,100 0 0,1 200,0 a 100,100 0 0,1 -200,0 "/></defs>
+			<g class="circleText fast" id="r131">
+					<use xlink:href="#criclePath" fill="none"/>
+					<text class="drumText">
+							<textPath xlink:href="#criclePath" >Q R S T U V W X Y Z A B C D E F G H I J K L M N O P </textPath>
+					</text>
+			</g>
+			<g><text x="100" y="140" class="drumHeading" id="rotor131">Z</text></g>
+	</svg>
+</div>
+</div>
+<div id="row2" class="row maroonRow">
+<div class="drum">
+	<svg viewBox="0 0 240 240" width="80" height="80">
+		<defs><path id="criclePath" d=" M 120, 120 m -100, 0 a 100,100 0 0,1 200,0 a 100,100 0 0,1 -200,0 "/></defs>
+			<g class="circleText medium" id="r12">
+					<use xlink:href="#criclePath" fill="none"/>
+					<text class="drumText">
+							<textPath xlink:href="#criclePath" >I H G F E D C B A Z Y X W V U T S R Q P O N M L K J</textPath>
+					</text>
+			</g>
+			<g><text x="100" y="140" class="drumHeading" id="rotor12">Z</text></g>
+	</svg>
+</div>
+<div class="drum">
+	<svg viewBox="0 0 240 240" width="80" height="80">
+		<defs><path id="criclePath" d=" M 120, 120 m -100, 0 a 100,100 0 0,1 200,0 a 100,100 0 0,1 -200,0 "/></defs>
+			<g class="circleText medium" id="r22">
+					<use xlink:href="#criclePath" fill="none"/>
+					<text class="drumText">
+							<textPath xlink:href="#criclePath" >I H G F E D C B A Z Y X W V U T S R Q P O N M L K J</textPath>
+					</text>
+			</g>
+			<g><text x="100" y="140" class="drumHeading" id="rotor22">Z</text></g>
+	</svg>
+</div>
+<div class="drum">
+	<svg viewBox="0 0 240 240" width="80" height="80">
+		<defs><path id="criclePath" d=" M 120, 120 m -100, 0 a 100,100 0 0,1 200,0 a 100,100 0 0,1 -200,0 "/></defs>
+			<g class="circleText medium" id="r32">
+					<use xlink:href="#criclePath" fill="none"/>
+					<text class="drumText">
+							<textPath xlink:href="#criclePath" >I H G F E D C B A Z Y X W V U T S R Q P O N M L K J</textPath>
+					</text>
+			</g>
+			<g><text x="100" y="140" class="drumHeading" id="rotor32">Z</text></g>
+	</svg>
+</div>
+<div class="drum">
+	<svg viewBox="0 0 240 240" width="80" height="80">
+		<defs><path id="criclePath" d=" M 120, 120 m -100, 0 a 100,100 0 0,1 200,0 a 100,100 0 0,1 -200,0 "/></defs>
+			<g class="circleText medium" id="r42">
+					<use xlink:href="#criclePath" fill="none"/>
+					<text class="drumText">
+							<textPath xlink:href="#criclePath" >I H G F E D C B A Z Y X W V U T S R Q P O N M L K J</textPath>
+					</text>
+			</g>
+			<g><text x="100" y="140" class="drumHeading" id="rotor42">Z</text></g>
+	</svg>
+</div>
+<div class="drum">
+	<svg viewBox="0 0 240 240" width="80" height="80">
+		<defs><path id="criclePath" d=" M 120, 120 m -100, 0 a 100,100 0 0,1 200,0 a 100,100 0 0,1 -200,0 "/></defs>
+			<g class="circleText medium" id="r52">
+					<use xlink:href="#criclePath" fill="none"/>
+					<text class="drumText">
+							<textPath xlink:href="#criclePath" >I H G F E D C B A Z Y X W V U T S R Q P O N M L K J</textPath>
+					</text>
+			</g>
+			<g><text x="100" y="140" class="drumHeading" id="rotor52">Z</text></g>
+	</svg>
+</div>
+<div class="drum">
+	<svg viewBox="0 0 240 240" width="80" height="80">
+		<defs><path id="criclePath" d=" M 120, 120 m -100, 0 a 100,100 0 0,1 200,0 a 100,100 0 0,1 -200,0 "/></defs>
+			<g class="circleText medium" id="r62">
+					<use xlink:href="#criclePath" fill="none"/>
+					<text class="drumText">
+							<textPath xlink:href="#criclePath" >I H G F E D C B A Z Y X W V U T S R Q P O N M L K J</textPath>
+					</text>
+			</g>
+			<g><text x="100" y="140" class="drumHeading" id="rotor62">Z</text></g>
+	</svg>
+</div>
+<div class="drum">
+	<svg viewBox="0 0 240 240" width="80" height="80">
+		<defs><path id="criclePath" d=" M 120, 120 m -100, 0 a 100,100 0 0,1 200,0 a 100,100 0 0,1 -200,0 "/></defs>
+			<g class="circleText medium" id="r72">
+					<use xlink:href="#criclePath" fill="none"/>
+					<text class="drumText">
+							<textPath xlink:href="#criclePath" >I H G F E D C B A Z Y X W V U T S R Q P O N M L K J</textPath>
+					</text>
+			</g>
+			<g><text x="100" y="140" class="drumHeading" id="rotor72">Z</text></g>
+	</svg>
+</div>
+<div class="drum">
+	<svg viewBox="0 0 240 240" width="80" height="80">
+		<defs><path id="criclePath" d=" M 120, 120 m -100, 0 a 100,100 0 0,1 200,0 a 100,100 0 0,1 -200,0 "/></defs>
+			<g class="circleText medium" id="r82">
+					<use xlink:href="#criclePath" fill="none"/>
+					<text class="drumText">
+							<textPath xlink:href="#criclePath" >I H G F E D C B A Z Y X W V U T S R Q P O N M L K J</textPath>
+					</text>
+			</g>
+			<g><text x="100" y="140" class="drumHeading" id="rotor82">Z</text></g>
+	</svg>
+</div>
+<div class="drum">
+	<svg viewBox="0 0 240 240" width="80" height="80">
+		<defs><path id="criclePath" d=" M 120, 120 m -100, 0 a 100,100 0 0,1 200,0 a 100,100 0 0,1 -200,0 "/></defs>
+			<g class="circleText medium" id="r92">
+					<use xlink:href="#criclePath" fill="none"/>
+					<text class="drumText">
+							<textPath xlink:href="#criclePath" >I H G F E D C B A Z Y X W V U T S R Q P O N M L K J</textPath>
+					</text>
+			</g>
+			<g><text x="100" y="140" class="drumHeading" id="rotor92">Z</text></g>
+	</svg>
+</div>
+<div class="drum">
+	<svg viewBox="0 0 240 240" width="80" height="80">
+		<defs><path id="criclePath" d=" M 120, 120 m -100, 0 a 100,100 0 0,1 200,0 a 100,100 0 0,1 -200,0 "/></defs>
+			<g class="circleText medium" id="r102">
+					<use xlink:href="#criclePath" fill="none"/>
+					<text class="drumText">
+							<textPath xlink:href="#criclePath" >I H G F E D C B A Z Y X W V U T S R Q P O N M L K J</textPath>
+					</text>
+			</g>
+			<g><text x="100" y="140" class="drumHeading" id="rotor102">Z</text></g>
+	</svg>
+</div>
+<div class="drum">
+	<svg viewBox="0 0 240 240" width="80" height="80">
+		<defs><path id="criclePath" d=" M 120, 120 m -100, 0 a 100,100 0 0,1 200,0 a 100,100 0 0,1 -200,0 "/></defs>
+			<g class="circleText medium" id="r112">
+					<use xlink:href="#criclePath" fill="none"/>
+					<text class="drumText">
+							<textPath xlink:href="#criclePath" >I H G F E D C B A Z Y X W V U T S R Q P O N M L K J</textPath>
+					</text>
+			</g>
+			<g><text x="100" y="140" class="drumHeading" id="rotor112">Z</text></g>
+	</svg>
+</div>
+<div class="drum">
+	<svg viewBox="0 0 240 240" width="80" height="80">
+		<defs><path id="criclePath" d=" M 120, 120 m -100, 0 a 100,100 0 0,1 200,0 a 100,100 0 0,1 -200,0 "/></defs>
+			<g class="circleText medium" id="r122">
+					<use xlink:href="#criclePath" fill="none"/>
+					<text class="drumText">
+							<textPath xlink:href="#criclePath" >I H G F E D C B A Z Y X W V U T S R Q P O N M L K J</textPath>
+					</text>
+			</g>
+			<g><text x="100" y="140" class="drumHeading" id="rotor122">Z</text></g>
+	</svg>
+</div>
+<div class="drum yellowDrum">
+	<svg viewBox="0 0 240 240" width="80" height="80">
+		<defs><path id="criclePath" d=" M 120, 120 m -100, 0 a 100,100 0 0,1 200,0 a 100,100 0 0,1 -200,0 "/></defs>
+			<g class="circleText medium" id="r132">
+					<use xlink:href="#criclePath" fill="none"/>
+					<text class="drumText">
+							<textPath xlink:href="#criclePath" >Q R S T U V W X Y Z A B C D E F G H I J K L M N O P </textPath>
+					</text>
+			</g>
+			<g><text x="100" y="140" class="drumHeading" id="rotor132">Z</text></g>
+	</svg>
+</div>
+</div>
+<div id="row3" class="row greenRow">
+<div class="drum">
+	<svg viewBox="0 0 240 240" width="80" height="80">
+		<defs><path id="criclePath" d=" M 120, 120 m -100, 0 a 100,100 0 0,1 200,0 a 100,100 0 0,1 -200,0 "/></defs>
+			<g class="circleText slow" id="r13">
+					<use xlink:href="#criclePath" fill="none"/>
+					<text class="drumText">
+							<textPath xlink:href="#criclePath" >I H G F E D C B A Z Y X W V U T S R Q P O N M L K J</textPath>
+					</text>
+			</g>
+			<g><text x="100" y="140" class="drumHeading" id="rotor13">Z</text></g>
+	</svg>
+</div>
+<div class="drum">
+	<svg viewBox="0 0 240 240" width="80" height="80">
+		<defs><path id="criclePath" d=" M 120, 120 m -100, 0 a 100,100 0 0,1 200,0 a 100,100 0 0,1 -200,0 "/></defs>
+			<g class="circleText slow" id="r23">
+					<use xlink:href="#criclePath" fill="none"/>
+					<text class="drumText">
+							<textPath xlink:href="#criclePath" >I H G F E D C B A Z Y X W V U T S R Q P O N M L K J</textPath>
+					</text>
+			</g>
+			<g><text x="100" y="140" class="drumHeading" id="rotor23">Z</text></g>
+	</svg>
+</div>
+<div class="drum">
+	<svg viewBox="0 0 240 240" width="80" height="80">
+		<defs><path id="criclePath" d=" M 120, 120 m -100, 0 a 100,100 0 0,1 200,0 a 100,100 0 0,1 -200,0 "/></defs>
+			<g class="circleText slow" id="r33">
+					<use xlink:href="#criclePath" fill="none"/>
+					<text class="drumText">
+							<textPath xlink:href="#criclePath" >I H G F E D C B A Z Y X W V U T S R Q P O N M L K J</textPath>
+					</text>
+			</g>
+			<g><text x="100" y="140" class="drumHeading" id="rotor33">Z</text></g>
+	</svg>
+</div>
+<div class="drum">
+	<svg viewBox="0 0 240 240" width="80" height="80">
+		<defs><path id="criclePath" d=" M 120, 120 m -100, 0 a 100,100 0 0,1 200,0 a 100,100 0 0,1 -200,0 "/></defs>
+			<g class="circleText slow" id="r43">
+					<use xlink:href="#criclePath" fill="none"/>
+					<text class="drumText">
+							<textPath xlink:href="#criclePath" >I H G F E D C B A Z Y X W V U T S R Q P O N M L K J</textPath>
+					</text>
+			</g>
+			<g><text x="100" y="140" class="drumHeading" id="rotor43">Z</text></g>
+	</svg>
+</div>
+<div class="drum">
+	<svg viewBox="0 0 240 240" width="80" height="80">
+		<defs><path id="criclePath" d=" M 120, 120 m -100, 0 a 100,100 0 0,1 200,0 a 100,100 0 0,1 -200,0 "/></defs>
+			<g class="circleText slow" id="r53">
+					<use xlink:href="#criclePath" fill="none"/>
+					<text class="drumText">
+							<textPath xlink:href="#criclePath" >I H G F E D C B A Z Y X W V U T S R Q P O N M L K J</textPath>
+					</text>
+			</g>
+			<g><text x="100" y="140" class="drumHeading" id="rotor53">Z</text></g>
+	</svg>
+</div>
+<div class="drum">
+	<svg viewBox="0 0 240 240" width="80" height="80">
+		<defs><path id="criclePath" d=" M 120, 120 m -100, 0 a 100,100 0 0,1 200,0 a 100,100 0 0,1 -200,0 "/></defs>
+			<g class="circleText slow" id="r63">
+					<use xlink:href="#criclePath" fill="none"/>
+					<text class="drumText">
+							<textPath xlink:href="#criclePath" >I H G F E D C B A Z Y X W V U T S R Q P O N M L K J</textPath>
+					</text>
+			</g>
+			<g><text x="100" y="140" class="drumHeading" id="rotor63">Z</text></g>
+	</svg>
+</div>
+<div class="drum">
+	<svg viewBox="0 0 240 240" width="80" height="80">
+		<defs><path id="criclePath" d=" M 120, 120 m -100, 0 a 100,100 0 0,1 200,0 a 100,100 0 0,1 -200,0 "/></defs>
+			<g class="circleText slow" id="r73">
+					<use xlink:href="#criclePath" fill="none"/>
+					<text class="drumText">
+							<textPath xlink:href="#criclePath" >I H G F E D C B A Z Y X W V U T S R Q P O N M L K J</textPath>
+					</text>
+			</g>
+			<g><text x="100" y="140" class="drumHeading" id="rotor73">Z</text></g>
+	</svg>
+</div>
+<div class="drum">
+	<svg viewBox="0 0 240 240" width="80" height="80">
+		<defs><path id="criclePath" d=" M 120, 120 m -100, 0 a 100,100 0 0,1 200,0 a 100,100 0 0,1 -200,0 "/></defs>
+			<g class="circleText slow" id="r83">
+					<use xlink:href="#criclePath" fill="none"/>
+					<text class="drumText">
+							<textPath xlink:href="#criclePath" >I H G F E D C B A Z Y X W V U T S R Q P O N M L K J</textPath>
+					</text>
+			</g>
+			<g><text x="100" y="140" class="drumHeading" id="rotor83">Z</text></g>
+	</svg>
+</div>
+<div class="drum">
+	<svg viewBox="0 0 240 240" width="80" height="80">
+		<defs><path id="criclePath" d=" M 120, 120 m -100, 0 a 100,100 0 0,1 200,0 a 100,100 0 0,1 -200,0 "/></defs>
+			<g class="circleText slow" id="r93">
+					<use xlink:href="#criclePath" fill="none"/>
+					<text class="drumText">
+							<textPath xlink:href="#criclePath" >I H G F E D C B A Z Y X W V U T S R Q P O N M L K J</textPath>
+					</text>
+			</g>
+			<g><text x="100" y="140" class="drumHeading" id="rotor93">Z</text></g>
+	</svg>
+</div>
+<div class="drum">
+	<svg viewBox="0 0 240 240" width="80" height="80">
+		<defs><path id="criclePath" d=" M 120, 120 m -100, 0 a 100,100 0 0,1 200,0 a 100,100 0 0,1 -200,0 "/></defs>
+			<g class="circleText slow" id="r103">
+					<use xlink:href="#criclePath" fill="none"/>
+					<text class="drumText">
+							<textPath xlink:href="#criclePath" >I H G F E D C B A Z Y X W V U T S R Q P O N M L K J</textPath>
+					</text>
+			</g>
+			<g><text x="100" y="140" class="drumHeading" id="rotor103">Z</text></g>
+	</svg>
+</div>
+<div class="drum">
+	<svg viewBox="0 0 240 240" width="80" height="80">
+		<defs><path id="criclePath" d=" M 120, 120 m -100, 0 a 100,100 0 0,1 200,0 a 100,100 0 0,1 -200,0 "/></defs>
+			<g class="circleText slow" id="r113">
+					<use xlink:href="#criclePath" fill="none"/>
+					<text class="drumText">
+							<textPath xlink:href="#criclePath" >I H G F E D C B A Z Y X W V U T S R Q P O N M L K J</textPath>
+					</text>
+			</g>
+			<g><text x="100" y="140" class="drumHeading" id="rotor113">Z</text></g>
+	</svg>
+</div>
+<div class="drum">
+	<svg viewBox="0 0 240 240" width="80" height="80">
+		<defs><path id="criclePath" d=" M 120, 120 m -100, 0 a 100,100 0 0,1 200,0 a 100,100 0 0,1 -200,0 "/></defs>
+			<g class="circleText slow" id="r123">
+					<use xlink:href="#criclePath" fill="none"/>
+					<text class="drumText">
+							<textPath xlink:href="#criclePath" >I H G F E D C B A Z Y X W V U T S R Q P O N M L K J</textPath>
+					</text>
+			</g>
+			<g><text x="100" y="140" class="drumHeading" id="rotor123">Z</text></g>
+	</svg>
+</div>
+<div class="drum yellowDrum">
+	<svg viewBox="0 0 240 240" width="80" height="80">
+		<defs><path id="criclePath" d=" M 120, 120 m -100, 0 a 100,100 0 0,1 200,0 a 100,100 0 0,1 -200,0 "/></defs>
+			<g class="circleText slow" id="r133">
+					<use xlink:href="#criclePath" fill="none"/>
+					<text class="drumText">
+							<textPath xlink:href="#criclePath" >Q R S T U V W X Y Z A B C D E F G H I J K L M N O P</textPath>
+					</text>
+			</g>
+			<g><text x="100" y="140" class="drumHeading" id="rotor133">Z</text></g>
+	</svg>
+</div>
+</div>
+
+<div class="drumbank">
+<div class="row redRow">  
+  <div class="drum"><svg viewBox="0 0 240 240" width="80" height="80"><defs><path id="criclePath" d=" M 120, 120 m -100, 0 a 100,100 0 0,1 200,0 a 100,100 0 0,1 -200,0 "/></defs><g class="circleText"><use xlink:href="#criclePath" fill="none"/><text class="drumText"><textPath xlink:href="#criclePath" >I H G F E D C B A Z Y X W V U T S R Q P O N M L K J</textPath></text></g></svg></div>
+  <div class="drum"><svg viewBox="0 0 240 240" width="80" height="80"><defs><path id="criclePath" d=" M 120, 120 m -100, 0 a 100,100 0 0,1 200,0 a 100,100 0 0,1 -200,0 "/></defs><g class="circleText"><use xlink:href="#criclePath" fill="none"/><text class="drumText"><textPath xlink:href="#criclePath" >I H G F E D C B A Z Y X W V U T S R Q P O N M L K J</textPath></text></g></svg></div>
+  <div class="drum"><svg viewBox="0 0 240 240" width="80" height="80"><defs><path id="criclePath" d=" M 120, 120 m -100, 0 a 100,100 0 0,1 200,0 a 100,100 0 0,1 -200,0 "/></defs><g class="circleText"><use xlink:href="#criclePath" fill="none"/><text class="drumText"><textPath xlink:href="#criclePath" >I H G F E D C B A Z Y X W V U T S R Q P O N M L K J</textPath></text></g></svg></div>
+  <div class="drum"><svg viewBox="0 0 240 240" width="80" height="80"><defs><path id="criclePath" d=" M 120, 120 m -100, 0 a 100,100 0 0,1 200,0 a 100,100 0 0,1 -200,0 "/></defs><g class="circleText"><use xlink:href="#criclePath" fill="none"/><text class="drumText"><textPath xlink:href="#criclePath" >I H G F E D C B A Z Y X W V U T S R Q P O N M L K J</textPath></text></g></svg></div>
+  <div class="drum"><svg viewBox="0 0 240 240" width="80" height="80"><defs><path id="criclePath" d=" M 120, 120 m -100, 0 a 100,100 0 0,1 200,0 a 100,100 0 0,1 -200,0 "/></defs><g class="circleText"><use xlink:href="#criclePath" fill="none"/><text class="drumText"><textPath xlink:href="#criclePath" >I H G F E D C B A Z Y X W V U T S R Q P O N M L K J</textPath></text></g></svg></div>
+  <div class="drum"><svg viewBox="0 0 240 240" width="80" height="80"><defs><path id="criclePath" d=" M 120, 120 m -100, 0 a 100,100 0 0,1 200,0 a 100,100 0 0,1 -200,0 "/></defs><g class="circleText"><use xlink:href="#criclePath" fill="none"/><text class="drumText"><textPath xlink:href="#criclePath" >I H G F E D C B A Z Y X W V U T S R Q P O N M L K J</textPath></text></g></svg></div>
+  <div class="drum"><svg viewBox="0 0 240 240" width="80" height="80"><defs><path id="criclePath" d=" M 120, 120 m -100, 0 a 100,100 0 0,1 200,0 a 100,100 0 0,1 -200,0 "/></defs><g class="circleText"><use xlink:href="#criclePath" fill="none"/><text class="drumText"><textPath xlink:href="#criclePath" >I H G F E D C B A Z Y X W V U T S R Q P O N M L K J</textPath></text></g></svg></div>
+  <div class="drum"><svg viewBox="0 0 240 240" width="80" height="80"><defs><path id="criclePath" d=" M 120, 120 m -100, 0 a 100,100 0 0,1 200,0 a 100,100 0 0,1 -200,0 "/></defs><g class="circleText"><use xlink:href="#criclePath" fill="none"/><text class="drumText"><textPath xlink:href="#criclePath" >I H G F E D C B A Z Y X W V U T S R Q P O N M L K J</textPath></text></g></svg></div>
+  <div class="drum"><svg viewBox="0 0 240 240" width="80" height="80"><defs><path id="criclePath" d=" M 120, 120 m -100, 0 a 100,100 0 0,1 200,0 a 100,100 0 0,1 -200,0 "/></defs><g class="circleText"><use xlink:href="#criclePath" fill="none"/><text class="drumText"><textPath xlink:href="#criclePath" >I H G F E D C B A Z Y X W V U T S R Q P O N M L K J</textPath></text></g></svg></div>
+  <div class="drum"><svg viewBox="0 0 240 240" width="80" height="80"><defs><path id="criclePath" d=" M 120, 120 m -100, 0 a 100,100 0 0,1 200,0 a 100,100 0 0,1 -200,0 "/></defs><g class="circleText"><use xlink:href="#criclePath" fill="none"/><text class="drumText"><textPath xlink:href="#criclePath" >I H G F E D C B A Z Y X W V U T S R Q P O N M L K J</textPath></text></g></svg></div>
+  <div class="drum"><svg viewBox="0 0 240 240" width="80" height="80"><defs><path id="criclePath" d=" M 120, 120 m -100, 0 a 100,100 0 0,1 200,0 a 100,100 0 0,1 -200,0 "/></defs><g class="circleText"><use xlink:href="#criclePath" fill="none"/><text class="drumText"><textPath xlink:href="#criclePath" >I H G F E D C B A Z Y X W V U T S R Q P O N M L K J</textPath></text></g></svg></div>
+  <div class="drum"><svg viewBox="0 0 240 240" width="80" height="80"><defs><path id="criclePath" d=" M 120, 120 m -100, 0 a 100,100 0 0,1 200,0 a 100,100 0 0,1 -200,0 "/></defs><g class="circleText"><use xlink:href="#criclePath" fill="none"/><text class="drumText"><textPath xlink:href="#criclePath" >I H G F E D C B A Z Y X W V U T S R Q P O N M L K J</textPath></text></g></svg></div>
+</div>  
+<div class="row maroonRow">  
+  <div class="drum"><svg viewBox="0 0 240 240" width="80" height="80"><defs><path id="criclePath" d=" M 120, 120 m -100, 0 a 100,100 0 0,1 200,0 a 100,100 0 0,1 -200,0 "/></defs><g class="circleText"><use xlink:href="#criclePath" fill="none"/><text class="drumText"><textPath xlink:href="#criclePath" >I H G F E D C B A Z Y X W V U T S R Q P O N M L K J</textPath></text></g></svg></div>
+  <div class="drum"><svg viewBox="0 0 240 240" width="80" height="80"><defs><path id="criclePath" d=" M 120, 120 m -100, 0 a 100,100 0 0,1 200,0 a 100,100 0 0,1 -200,0 "/></defs><g class="circleText"><use xlink:href="#criclePath" fill="none"/><text class="drumText"><textPath xlink:href="#criclePath" >I H G F E D C B A Z Y X W V U T S R Q P O N M L K J</textPath></text></g></svg></div>
+  <div class="drum"><svg viewBox="0 0 240 240" width="80" height="80"><defs><path id="criclePath" d=" M 120, 120 m -100, 0 a 100,100 0 0,1 200,0 a 100,100 0 0,1 -200,0 "/></defs><g class="circleText"><use xlink:href="#criclePath" fill="none"/><text class="drumText"><textPath xlink:href="#criclePath" >I H G F E D C B A Z Y X W V U T S R Q P O N M L K J</textPath></text></g></svg></div>
+  <div class="drum"><svg viewBox="0 0 240 240" width="80" height="80"><defs><path id="criclePath" d=" M 120, 120 m -100, 0 a 100,100 0 0,1 200,0 a 100,100 0 0,1 -200,0 "/></defs><g class="circleText"><use xlink:href="#criclePath" fill="none"/><text class="drumText"><textPath xlink:href="#criclePath" >I H G F E D C B A Z Y X W V U T S R Q P O N M L K J</textPath></text></g></svg></div>
+  <div class="drum"><svg viewBox="0 0 240 240" width="80" height="80"><defs><path id="criclePath" d=" M 120, 120 m -100, 0 a 100,100 0 0,1 200,0 a 100,100 0 0,1 -200,0 "/></defs><g class="circleText"><use xlink:href="#criclePath" fill="none"/><text class="drumText"><textPath xlink:href="#criclePath" >I H G F E D C B A Z Y X W V U T S R Q P O N M L K J</textPath></text></g></svg></div>
+  <div class="drum"><svg viewBox="0 0 240 240" width="80" height="80"><defs><path id="criclePath" d=" M 120, 120 m -100, 0 a 100,100 0 0,1 200,0 a 100,100 0 0,1 -200,0 "/></defs><g class="circleText"><use xlink:href="#criclePath" fill="none"/><text class="drumText"><textPath xlink:href="#criclePath" >I H G F E D C B A Z Y X W V U T S R Q P O N M L K J</textPath></text></g></svg></div>
+  <div class="drum"><svg viewBox="0 0 240 240" width="80" height="80"><defs><path id="criclePath" d=" M 120, 120 m -100, 0 a 100,100 0 0,1 200,0 a 100,100 0 0,1 -200,0 "/></defs><g class="circleText"><use xlink:href="#criclePath" fill="none"/><text class="drumText"><textPath xlink:href="#criclePath" >I H G F E D C B A Z Y X W V U T S R Q P O N M L K J</textPath></text></g></svg></div>
+  <div class="drum"><svg viewBox="0 0 240 240" width="80" height="80"><defs><path id="criclePath" d=" M 120, 120 m -100, 0 a 100,100 0 0,1 200,0 a 100,100 0 0,1 -200,0 "/></defs><g class="circleText"><use xlink:href="#criclePath" fill="none"/><text class="drumText"><textPath xlink:href="#criclePath" >I H G F E D C B A Z Y X W V U T S R Q P O N M L K J</textPath></text></g></svg></div>
+  <div class="drum"><svg viewBox="0 0 240 240" width="80" height="80"><defs><path id="criclePath" d=" M 120, 120 m -100, 0 a 100,100 0 0,1 200,0 a 100,100 0 0,1 -200,0 "/></defs><g class="circleText"><use xlink:href="#criclePath" fill="none"/><text class="drumText"><textPath xlink:href="#criclePath" >I H G F E D C B A Z Y X W V U T S R Q P O N M L K J</textPath></text></g></svg></div>
+  <div class="drum"><svg viewBox="0 0 240 240" width="80" height="80"><defs><path id="criclePath" d=" M 120, 120 m -100, 0 a 100,100 0 0,1 200,0 a 100,100 0 0,1 -200,0 "/></defs><g class="circleText"><use xlink:href="#criclePath" fill="none"/><text class="drumText"><textPath xlink:href="#criclePath" >I H G F E D C B A Z Y X W V U T S R Q P O N M L K J</textPath></text></g></svg></div>
+  <div class="drum"><svg viewBox="0 0 240 240" width="80" height="80"><defs><path id="criclePath" d=" M 120, 120 m -100, 0 a 100,100 0 0,1 200,0 a 100,100 0 0,1 -200,0 "/></defs><g class="circleText"><use xlink:href="#criclePath" fill="none"/><text class="drumText"><textPath xlink:href="#criclePath" >I H G F E D C B A Z Y X W V U T S R Q P O N M L K J</textPath></text></g></svg></div>
+  <div class="drum"><svg viewBox="0 0 240 240" width="80" height="80"><defs><path id="criclePath" d=" M 120, 120 m -100, 0 a 100,100 0 0,1 200,0 a 100,100 0 0,1 -200,0 "/></defs><g class="circleText"><use xlink:href="#criclePath" fill="none"/><text class="drumText"><textPath xlink:href="#criclePath" >I H G F E D C B A Z Y X W V U T S R Q P O N M L K J</textPath></text></g></svg></div>
+</div>   
+ <div class="row greenRow">  
+  <div class="drum"><svg viewBox="0 0 240 240" width="80" height="80"><defs><path id="criclePath" d=" M 120, 120 m -100, 0 a 100,100 0 0,1 200,0 a 100,100 0 0,1 -200,0 "/></defs><g class="circleText"><use xlink:href="#criclePath" fill="none"/><text class="drumText"><textPath xlink:href="#criclePath" >I H G F E D C B A Z Y X W V U T S R Q P O N M L K J</textPath></text></g></svg></div>
+  <div class="drum"><svg viewBox="0 0 240 240" width="80" height="80"><defs><path id="criclePath" d=" M 120, 120 m -100, 0 a 100,100 0 0,1 200,0 a 100,100 0 0,1 -200,0 "/></defs><g class="circleText"><use xlink:href="#criclePath" fill="none"/><text class="drumText"><textPath xlink:href="#criclePath" >I H G F E D C B A Z Y X W V U T S R Q P O N M L K J</textPath></text></g></svg></div>
+  <div class="drum"><svg viewBox="0 0 240 240" width="80" height="80"><defs><path id="criclePath" d=" M 120, 120 m -100, 0 a 100,100 0 0,1 200,0 a 100,100 0 0,1 -200,0 "/></defs><g class="circleText"><use xlink:href="#criclePath" fill="none"/><text class="drumText"><textPath xlink:href="#criclePath" >I H G F E D C B A Z Y X W V U T S R Q P O N M L K J</textPath></text></g></svg></div>
+  <div class="drum"><svg viewBox="0 0 240 240" width="80" height="80"><defs><path id="criclePath" d=" M 120, 120 m -100, 0 a 100,100 0 0,1 200,0 a 100,100 0 0,1 -200,0 "/></defs><g class="circleText"><use xlink:href="#criclePath" fill="none"/><text class="drumText"><textPath xlink:href="#criclePath" >I H G F E D C B A Z Y X W V U T S R Q P O N M L K J</textPath></text></g></svg></div>
+  <div class="drum"><svg viewBox="0 0 240 240" width="80" height="80"><defs><path id="criclePath" d=" M 120, 120 m -100, 0 a 100,100 0 0,1 200,0 a 100,100 0 0,1 -200,0 "/></defs><g class="circleText"><use xlink:href="#criclePath" fill="none"/><text class="drumText"><textPath xlink:href="#criclePath" >I H G F E D C B A Z Y X W V U T S R Q P O N M L K J</textPath></text></g></svg></div>
+  <div class="drum"><svg viewBox="0 0 240 240" width="80" height="80"><defs><path id="criclePath" d=" M 120, 120 m -100, 0 a 100,100 0 0,1 200,0 a 100,100 0 0,1 -200,0 "/></defs><g class="circleText"><use xlink:href="#criclePath" fill="none"/><text class="drumText"><textPath xlink:href="#criclePath" >I H G F E D C B A Z Y X W V U T S R Q P O N M L K J</textPath></text></g></svg></div>
+  <div class="drum"><svg viewBox="0 0 240 240" width="80" height="80"><defs><path id="criclePath" d=" M 120, 120 m -100, 0 a 100,100 0 0,1 200,0 a 100,100 0 0,1 -200,0 "/></defs><g class="circleText"><use xlink:href="#criclePath" fill="none"/><text class="drumText"><textPath xlink:href="#criclePath" >I H G F E D C B A Z Y X W V U T S R Q P O N M L K J</textPath></text></g></svg></div>
+  <div class="drum"><svg viewBox="0 0 240 240" width="80" height="80"><defs><path id="criclePath" d=" M 120, 120 m -100, 0 a 100,100 0 0,1 200,0 a 100,100 0 0,1 -200,0 "/></defs><g class="circleText"><use xlink:href="#criclePath" fill="none"/><text class="drumText"><textPath xlink:href="#criclePath" >I H G F E D C B A Z Y X W V U T S R Q P O N M L K J</textPath></text></g></svg></div>
+  <div class="drum"><svg viewBox="0 0 240 240" width="80" height="80"><defs><path id="criclePath" d=" M 120, 120 m -100, 0 a 100,100 0 0,1 200,0 a 100,100 0 0,1 -200,0 "/></defs><g class="circleText"><use xlink:href="#criclePath" fill="none"/><text class="drumText"><textPath xlink:href="#criclePath" >I H G F E D C B A Z Y X W V U T S R Q P O N M L K J</textPath></text></g></svg></div>
+  <div class="drum"><svg viewBox="0 0 240 240" width="80" height="80"><defs><path id="criclePath" d=" M 120, 120 m -100, 0 a 100,100 0 0,1 200,0 a 100,100 0 0,1 -200,0 "/></defs><g class="circleText"><use xlink:href="#criclePath" fill="none"/><text class="drumText"><textPath xlink:href="#criclePath" >I H G F E D C B A Z Y X W V U T S R Q P O N M L K J</textPath></text></g></svg></div>
+  <div class="drum"><svg viewBox="0 0 240 240" width="80" height="80"><defs><path id="criclePath" d=" M 120, 120 m -100, 0 a 100,100 0 0,1 200,0 a 100,100 0 0,1 -200,0 "/></defs><g class="circleText"><use xlink:href="#criclePath" fill="none"/><text class="drumText"><textPath xlink:href="#criclePath" >I H G F E D C B A Z Y X W V U T S R Q P O N M L K J</textPath></text></g></svg></div>
+  <div class="drum"><svg viewBox="0 0 240 240" width="80" height="80"><defs><path id="criclePath" d=" M 120, 120 m -100, 0 a 100,100 0 0,1 200,0 a 100,100 0 0,1 -200,0 "/></defs><g class="circleText"><use xlink:href="#criclePath" fill="none"/><text class="drumText"><textPath xlink:href="#criclePath" >I H G F E D C B A Z Y X W V U T S R Q P O N M L K J</textPath></text></g></svg></div>
+</div> 
+
+<div class="drumBankSettings">
+<H2>Enigma Settings: <a onClick="document.getElementById('EnigmaSettings').innerHTML='';" style="float: right;">Clear</a> </H2>
+<div id="EnigmaSettings"></div>
+</div>
+</div>
+</div>
+ <!--graph-->
+<script src='https://cdnjs.cloudflare.com/ajax/libs/jquery/3.1.0/jquery.min.js'></script>
+<script src='https://cdnjs.cloudflare.com/ajax/libs/d3/4.2.2/d3.min.js'></script>
+<script>
+$(document).ready(function(){
+    $(":input").keypress(function(event){
+        var inputValue = event.charCode;
+        if(!(inputValue >= 65 && inputValue <= 90) && !(inputValue >= 97 && inputValue <= 122)){
+            event.preventDefault();
+        }
+    });
+});
+ $(function () {
+            var focusedElement;
+            $(document).on('focus', 'input', function () {
+                if (focusedElement == this) return; //already focused, return so user can now place cursor at specific point in input.
+                focusedElement = this;
+                setTimeout(function () { focusedElement.select(); }, 50); //select all text in any field on focus for easy re-entry. Delay sightly to allow focus to "stick" before selecting.
+            });
+        });
+		
+$(function() {
+    $('input').keyup(function() {
+        this.value = this.value.toUpperCase();
+    });
+});		
+</script>
+<div id="footer"><br>The Turing-Welchman Bombe - Revisited by <a href="https://www.101computing.net" target="_blank">101computing.net</a></div>
+</body>
+</html>
